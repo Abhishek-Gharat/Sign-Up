@@ -1,10 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../services/firebase";
-
 function Welcome() {
 
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+
+   localStorage.removeItem("token");
+   navigate("/");
+
+}
   const verifyEmailHandler = async () => {
 
     try {
@@ -61,7 +66,9 @@ function Welcome() {
           Verify Email
         </button>
       )}
-
+<button onClick={handleLogout}>
+   Logout
+</button>
     </div>
   );
 }
