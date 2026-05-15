@@ -1,0 +1,60 @@
+.singup-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000;
+}
+.sign-up-card{
+    width: 350px;
+    background: #353434;
+    padding: 30px;
+    border-radius: 20px;
+}
+.sign-up-card h1{
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.sign-up-card input{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    background: #ffffff;
+    color: #000000;
+}
+.sign-up-card button{
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    background: #000000;
+    color: #ffffff;
+    cursor: pointer;
+}
+.sign-up-card button:hover{
+    background: #ffffff;
+    color: #000000;
+    transition: 0.3s ease-in-out;
+}
+.sign-up-card a{
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+}
+.sign-up-card a:hover{
+    color: #ffffff;
+    text-decoration: underline;
+}
+.sign-up-card a:hover{
+    color: #ffffff;
+    text-decoration: underline;
+}
