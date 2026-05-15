@@ -6,11 +6,11 @@ import {
   createUserWithEmailAndPassword
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import { auth } from "../../services/firebase";
 
 import { Link } from "react-router-dom";
 
-import "./Auth.css";
+import "../../styles/Auth.css";
 
 function Signup() {
 

@@ -9,9 +9,9 @@ import {
   updateProfile
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import { auth } from "../../services/firebase";
 
-import "./Profile.css";
+import "../../styles/Auth.css";
 
 function Profile() {
 

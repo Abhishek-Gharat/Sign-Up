@@ -6,14 +6,14 @@ import {
   signInWithEmailAndPassword
 } from "firebase/auth";
 
-import { auth } from "../firebase";
+import { auth } from "../../services/firebase";
 
 import {
   Link,
   useNavigate
 } from "react-router-dom";
 
-import "./Auth.css";
+import "../../styles/Auth.css";
 
 function Login() {
 

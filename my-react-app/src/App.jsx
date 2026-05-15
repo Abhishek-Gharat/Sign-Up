@@ -1,9 +1,9 @@
 // App.jsx
 
-import Login from "./pages/login";
-import Signup from "./pages/Signup";
-import Welcome from "./pages/Welcome";
-import Profile from "./pages/Profile";
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Signup/Signup";
+import Welcome from "./pages/Welcome/Welcome";
+import Profile from "./pages/Profile/Profile";
 
 import {
   BrowserRouter,
