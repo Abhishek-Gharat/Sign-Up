@@ -154,9 +154,14 @@ function Login() {
             }
           </button>
 
-          <p className="forgot-password">
+          {/* <p className="forgot-password">
             Forgot Password
-          </p>
+          </p> */}
+          <Link to="/forgot-password">
+            <p className="forgot-password">
+              Forgot Password
+            </p>
+          </Link>
 
           <p className="error">
             {error}

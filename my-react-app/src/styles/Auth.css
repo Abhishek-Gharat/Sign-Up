@@ -100,6 +100,12 @@ body{
 }
 
 /* Forgot Password */
+.success{
+   color:green;
+   text-align:center;
+   margin-top:10px;
+}
+
 
 .forgot-password{
     text-align:center;

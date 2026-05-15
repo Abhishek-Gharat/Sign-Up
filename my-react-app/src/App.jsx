@@ -4,7 +4,7 @@ import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import Welcome from "./pages/Welcome/Welcome";
 import Profile from "./pages/Profile/Profile";
-
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import {
   BrowserRouter,
   Routes,
@@ -38,7 +38,10 @@ function App() {
           path="/profile"
           element={<Profile />}
         />
-
+      <Route
+   path="/forgot-password"
+   element={<ForgotPassword />}
+/>
       </Routes>
 
     </BrowserRouter>
