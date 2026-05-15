@@ -8,6 +8,7 @@ import {
   addExpense,
   subscribeToExpenses,
   deleteExpense,
+  updateExpense,
 } from "../../services/expenseService";
 import "./Expenses.css";
 
@@ -19,7 +20,8 @@ function Expenses() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
+const [editingId, setEditingId] =
+  useState(null);
   // GET LOGGED IN USER
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -53,42 +55,102 @@ function Expenses() {
   }, [user]);
 
   // ADD EXPENSE
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!amount || !description) {
-      alert("Please fill all fields");
-      return;
+  if (
+    !amount ||
+    !description ||
+    !category
+  ) {
+    alert("Please fill all fields");
+
+    return;
+  }
+
+  if (!user) {
+    alert("User not logged in");
+
+    return;
+  }
+
+  const expenseData = {
+    amount: Number(amount),
+    description,
+    category,
+    date: new Date().toISOString(),
+  };
+
+  let result;
+
+  // UPDATE EXPENSE
+  if (editingId) {
+    result = await updateExpense(
+      user.uid,
+      editingId,
+      expenseData
+    );
+
+    if (result.success) {
+      console.log(
+        "Expense updated successfully"
+      );
+
+      // RESET EDIT MODE
+      setEditingId(null);
+
+      setAmount("");
+      setDescription("");
+      setCategory("");
     }
+  }
 
-    if (!user) {
-      alert("User not logged in");
-      return;
-    }
-
-    const expenseData = {
-      amount: Number(amount),
-      description,
-      category,
-      date: new Date().toISOString(),
-    };
-
-    const result = await addExpense(user.uid, expenseData);
+  // ADD EXPENSE
+  else {
+    result = await addExpense(
+      user.uid,
+      expenseData
+    );
 
     if (result.success) {
       setAmount("");
       setDescription("");
-      setCategory("Food");
-    } else {
-      alert(result.error);
+      setCategory("");
     }
-  };
+  }
 
+  if (!result.success) {
+    alert(result.error);
+  }
+};
+
+
+const handleEdit = (expense) => {
+  setAmount(expense.amount);
+
+  setDescription(
+    expense.description
+  );
+
+  setCategory(expense.category);
+
+  setEditingId(expense.id);
+};
   // DELETE EXPENSE
-  const handleDelete = async (id) => {
-    if (!user) return;
-    await deleteExpense(user.uid, id);
-  };
+const handleDelete = async (id) => {
+  if (!user) return;
+
+  const result = await deleteExpense(
+    user.uid,
+    id
+  );
+
+  if (result.success) {
+    console.log(
+      "Expense successfully deleted"
+    );
+  }
+};
 
   // HANDLE LOGOUT
   const handleLogout = () => {
@@ -188,8 +250,11 @@ function Expenses() {
             <option>Salary</option>
             <option>Bills</option>
           </select>
-          <button type="submit">Add Expense</button>
-        </form>
+<button type="submit">
+  {editingId
+    ? "Update Expense"
+    : "Add Expense"}
+</button>        </form>
 
         {/* Loading */}
         {loading ? (
@@ -217,12 +282,27 @@ function Expenses() {
                 </div>
                 <div className="expense-item-actions">
                   <span className="expense-amount">₹{expense.amount.toFixed(2)}</span>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(expense.id)}
-                  >
-                    Delete
-                  </button>
+                 <div className="expense-buttons">
+
+  <button
+    className="edit-btn"
+    onClick={() =>
+      handleEdit(expense)
+    }
+  >
+    Edit
+  </button>
+
+  <button
+    className="delete-btn"
+    onClick={() =>
+      handleDelete(expense.id)
+    }
+  >
+    Delete
+  </button>
+
+</div>
                 </div>
               </div>
             ))}
