@@ -51,12 +51,16 @@ function Welcome() {
   };
 
   return (
-    <div>
+    <div className="welcome-page">
 
       <h1>Welcome To Expense Tracker</h1>
 
       <button onClick={() => navigate("/profile")}>
         Complete Profile
+      </button>
+
+      <button onClick={() => navigate("/expenses")} className="expenses-btn">
+        💰 Manage Expenses
       </button>
 
       {auth.currentUser?.emailVerified ? (

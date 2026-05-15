@@ -5,6 +5,7 @@ import Signup from "./pages/Signup/Signup";
 import Welcome from "./pages/Welcome/Welcome";
 import Profile from "./pages/Profile/Profile";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import Expenses from "./pages/Expenses/Expenses";
 import {
   BrowserRouter,
   Routes,
@@ -38,10 +39,17 @@ function App() {
           path="/profile"
           element={<Profile />}
         />
-      <Route
-   path="/forgot-password"
-   element={<ForgotPassword />}
-/>
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/expenses"
+          element={<Expenses />}
+        />
+
       </Routes>
 
     </BrowserRouter>
