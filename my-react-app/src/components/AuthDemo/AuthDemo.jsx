@@ -1,6 +1,6 @@
 // AuthDemo.jsx - Authentication demonstration with conditional rendering
 import { useSelector, useDispatch } from 'react-redux';
-import { login, logout } from '../../store/authSlice';
+import { loginUser, logout, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { useState } from 'react';
 
 function AuthDemo() {
@@ -8,17 +8,18 @@ function AuthDemo() {
   // state.auth.isAuthenticated because:
   // - auth is the slice name (from authSlice.name)
   // - isAuthenticated is the property in the slice
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const dispatch = useDispatch();
   
   // Local state for form (we don't actually use the values)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Don't care about what user enters, just log them in
-    dispatch(login());
+    // For demo purposes, we'll just dispatch loginUser with dummy data
+    // In a real app, this would validate and call API
+    await dispatch(loginUser({ email: email || 'demo@test.com', password: password || 'password' }));
   };
 
   const handleLogout = () => {

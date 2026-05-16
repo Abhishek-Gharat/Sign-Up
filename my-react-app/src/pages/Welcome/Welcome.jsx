@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, selectEmail, selectIsAuthenticated } from "../../store/slices/authSlice";
+import { logout, selectIsAuthenticated, selectEmail } from "../../store/slices/authSlice";
 
 function Welcome() {
   const navigate = useNavigate();
@@ -58,6 +58,8 @@ function Welcome() {
   return (
     <div className="welcome-page">
       <h1>Welcome To Expense Tracker</h1>
+
+
 
       {email && <p style={{ marginBottom: "20px", color: "#666" }}>{email}</p>}
 

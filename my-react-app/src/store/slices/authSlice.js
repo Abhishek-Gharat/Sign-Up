@@ -172,5 +172,6 @@ export const selectUserId = (state) => state.auth.userId;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state) => state.auth.isLoading;
 export const selectAuthError = (state) => state.auth.error;
+export const selectEmail = (state) => state.auth.email;
 
 export default authSlice.reducer;
