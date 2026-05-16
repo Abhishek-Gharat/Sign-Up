@@ -61,6 +61,15 @@ body{
    box-shadow:0 4px 12px rgba(40,167,69,0.3);
 }
 
+.welcome-page .counter-btn {
+   background:#6f42c1;
+}
+
+.welcome-page .counter-btn:hover {
+   background:#5a32a3;
+   box-shadow:0 4px 12px rgba(111,66,193,0.3);
+}
+
 .welcome-container{
    height:100vh;
    display:flex;

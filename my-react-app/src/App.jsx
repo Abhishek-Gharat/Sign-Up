@@ -6,6 +6,7 @@ import Welcome from "./pages/Welcome/Welcome";
 import Profile from "./pages/Profile/Profile";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import Expenses from "./pages/Expenses/Expenses";
+import Counter from "./components/Counter/Counter";
 import {
   BrowserRouter,
   Routes,
@@ -48,6 +49,11 @@ function App() {
         <Route
           path="/expenses"
           element={<Expenses />}
+        />
+
+        <Route
+          path="/counter"
+          element={<Counter />}
         />
 
       </Routes>

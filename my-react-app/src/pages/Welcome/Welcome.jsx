@@ -63,6 +63,10 @@ function Welcome() {
         💰 Manage Expenses
       </button>
 
+      <button onClick={() => navigate("/counter")} className="counter-btn">
+        🔢 Redux Counter Demo
+      </button>
+
       {auth.currentUser?.emailVerified ? (
         <h3>Email Verified ✅</h3>
       ) : (
