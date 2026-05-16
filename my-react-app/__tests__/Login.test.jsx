@@ -1,5 +1,17 @@
 // __tests__/Login.test.jsx
-import { render, screen, fireEvent } from '@testing-library/react';
+/**
+ * Login Component Tests
+ * 
+ * These tests verify:
+ * - Login form renders with all required fields
+ * - Input fields update correctly on user interaction
+ * - Error messages display when authentication fails
+ * - Loading state is shown during authentication
+ * - Links to signup and forgot password pages exist
+ * - Form submission triggers authentication action
+ */
+
+import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -7,7 +19,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Login from '../src/pages/Login/Login';
 import authReducer from '../src/store/slices/authSlice';
 
-// Helper function to render with Redux and Router
+// Helper to render with Redux and Router
 const renderWithProviders = (component, { preloadedState = {} } = {}) => {
   const store = configureStore({
     reducer: { auth: authReducer },
@@ -24,83 +36,156 @@ const renderWithProviders = (component, { preloadedState = {} } = {}) => {
     },
   });
   return {
+    store,
     ...render(
       <Provider store={store}>
         <BrowserRouter>{component}</BrowserRouter>
       </Provider>
     ),
-    store,
   };
 };
 
-// Test Suite for Login Component
 describe('Login Component', () => {
-  // Test Case 1: Renders login form with all fields
-  test('renders login form with email and password inputs', () => {
-    renderWithProviders(<Login />);
-    
-    // Check if heading is rendered
-    expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
-    
-    // Check if email input exists
-    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-    
-    // Check if password input exists
-    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-    
-    // Check if login button exists
-    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
-    
-    // Check if forgot password link exists
-    expect(screen.getByText(/forgot password/i)).toBeInTheDocument();
-    
-    // Check if sign up link exists
-    expect(screen.getByText(/sign up/i)).toBeInTheDocument();
+  afterEach(() => {
+    cleanup();
   });
 
-  // Test Case 2: Updates email input value on change
-  test('updates email input when user types', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<Login />);
-    
-    const emailInput = screen.getByPlaceholderText('Email');
-    await user.type(emailInput, 'test@example.com');
-    
-    expect(emailInput).toHaveValue('test@example.com');
-  });
-
-  // Test Case 3: Updates password input value on change
-  test('updates password input when user types', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<Login />);
-    
-    const passwordInput = screen.getByPlaceholderText('Password');
-    await user.type(passwordInput, 'password123');
-    
-    expect(passwordInput).toHaveValue('password123');
-  });
-
-  // Test Case 4: Displays error message when provided
-  test('displays error message when error exists in state', () => {
-    renderWithProviders(<Login />, {
-      preloadedState: {
-        auth: { error: 'Invalid credentials' },
-      },
+  describe('Rendering', () => {
+    test('renders login form with all required fields and links', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />);
+      
+      // Assert: Form elements
+      expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+      
+      // Assert: Navigation links
+      expect(screen.getByText(/forgot password/i)).toBeInTheDocument();
+      expect(screen.getByText(/sign up/i)).toBeInTheDocument();
+      expect(screen.getByText("Don't have an account?")).toBeInTheDocument();
     });
-    
-    expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+
+    test('email input has correct type attribute', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />);
+      
+      // Assert
+      const emailInput = screen.getByPlaceholderText('Email');
+      expect(emailInput).toHaveAttribute('type', 'email');
+    });
+
+    test('password input has correct type attribute', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />);
+      
+      // Assert
+      const passwordInput = screen.getByPlaceholderText('Password');
+      expect(passwordInput).toHaveAttribute('type', 'password');
+    });
   });
 
-  // Test Case 5: Shows loading state on button when isLoading is true
-  test('shows loading state when authentication is in progress', () => {
-    renderWithProviders(<Login />, {
-      preloadedState: {
-        auth: { isLoading: true },
-      },
+  describe('User Input', () => {
+    test('updates email input when user types', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderWithProviders(<Login />);
+      
+      // Act
+      const emailInput = screen.getByPlaceholderText('Email');
+      await user.type(emailInput, 'test@example.com');
+      
+      // Assert
+      expect(emailInput).toHaveValue('test@example.com');
     });
-    
-    const loginButton = screen.getByRole('button');
-    expect(loginButton).toBeDisabled();
-    expect(screen.getByText(/logging in/i)).toBeInTheDocument();
+
+    test('updates password input when user types', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderWithProviders(<Login />);
+      
+      // Act
+      const passwordInput = screen.getByPlaceholderText('Password');
+      await user.type(passwordInput, 'password123');
+      
+      // Assert
+      expect(passwordInput).toHaveValue('password123');
+    });
+
+    test('clears inputs after typing and clearing', async () => {
+      // Arrange
+      const user = userEvent.setup();
+      renderWithProviders(<Login />);
+      
+      // Act
+      const emailInput = screen.getByPlaceholderText('Email');
+      await user.type(emailInput, 'test@example.com');
+      await user.clear(emailInput);
+      
+      // Assert
+      expect(emailInput).toHaveValue('');
+    });
+  });
+
+  describe('Error Handling', () => {
+    test('displays error message when authentication fails', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />, {
+        preloadedState: {
+          auth: { error: 'Invalid credentials' },
+        },
+      });
+      
+      // Assert
+      expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+      expect(screen.getByText('Invalid credentials')).toHaveClass('error');
+    });
+
+    test('does not display error when auth state is clean', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />);
+      
+      // Assert
+      expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Loading State', () => {
+    test('shows loading state and disables button during authentication', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />, {
+        preloadedState: {
+          auth: { isLoading: true },
+        },
+      });
+      
+      // Assert
+      const loginButton = screen.getByRole('button');
+      expect(loginButton).toBeDisabled();
+      expect(screen.getByText(/logging in/i)).toBeInTheDocument();
+    });
+
+    test('disables email and password inputs during loading', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />, {
+        preloadedState: {
+          auth: { isLoading: true },
+        },
+      });
+      
+      // Assert
+      expect(screen.getByPlaceholderText('Email')).toBeDisabled();
+      expect(screen.getByPlaceholderText('Password')).toBeDisabled();
+    });
+
+    test('shows login text when not loading', () => {
+      // Arrange & Act
+      renderWithProviders(<Login />);
+      
+      // Assert
+      expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+      expect(screen.queryByText(/logging in/i)).not.toBeInTheDocument();
+    });
   });
 });

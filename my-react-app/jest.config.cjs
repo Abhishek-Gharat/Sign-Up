@@ -7,4 +7,8 @@ module.exports = {
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/utils/',
+  ],
 };
