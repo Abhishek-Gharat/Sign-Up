@@ -1,6 +1,6 @@
 // Counter.jsx - Component demonstrating Redux usage
 import { useSelector, useDispatch } from 'react-redux';
-import { increment, decrement, incrementByAmount } from '../../store/counterSlice';
+import { increment, decrement, incrementByAmount, incrementBy2, decrementBy2 } from '../../store/counterSlice';
 
 function Counter() {
   const count = useSelector((state) => state.counter.value);
@@ -59,11 +59,31 @@ function Counter() {
         </button>
       </div>
 
+      <div style={{ marginTop: '20px' }}>
+        <button 
+          onClick={() => dispatch(incrementBy2())}
+          style={{ padding: '10px 20px', fontSize: '16px', backgroundColor: '#ffc107', color: '#000' }}
+        >
+          Increment by 2 (+2)
+        </button>
+      </div>
+
+      <div style={{ marginTop: '10px' }}>
+        <button 
+          onClick={() => dispatch(decrementBy2())}
+          style={{ padding: '10px 20px', fontSize: '16px', backgroundColor: '#dc3545', color: 'white' }}
+        >
+          Decrement by 2 (-2)
+        </button>
+      </div>
+
       <div style={{ marginTop: '30px', textAlign: 'left', maxWidth: '600px', margin: '30px auto' }}>
         <h3>Answers to Questions:</h3>
         <p><strong>Counter value after 5 dispatches:</strong> The counter will increase by 5 (from 0 to 5, or whatever current value + 5)</p>
         <p><strong>Decrement action:</strong> The counter <strong>decreases</strong> in value when decrement is called</p>
         <p><strong>Reducer handles decrement:</strong> See counterSlice.js - the decrement reducer subtracts 1 from state.value</p>
+        <p><strong>INCREMENTBY2:</strong> New action type that increases counter by 2</p>
+        <p><strong>DECREMENTBY2:</strong> New action type that decreases counter by 2</p>
       </div>
     </div>
   );
