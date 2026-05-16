@@ -1,188 +1,96 @@
-
-
-import { useState } from "react";
-
-import {
-  signInWithEmailAndPassword
-} from "firebase/auth";
-
-import { auth } from "../../services/firebase";
-
-import {
-  Link,
-  useNavigate
-} from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, selectAuthLoading, selectAuthError, selectIsAuthenticated, clearError } from "../../store/slices/authSlice";
 import "../../styles/Auth.css";
 
 function Login() {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
+  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // Get auth state from Redux
+  const isLoading = useSelector(selectAuthLoading);
+  const error = useSelector(selectAuthError);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/welcome");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
-    setError("");
-
     // Validation
-
     if (!email || !password) {
-      setError("All fields are required");
-      return;
+      // Dispatch will handle validation in async thunk
     }
 
-    setIsLoading(true);
+    // Dispatch login action
+    const resultAction = await dispatch(
+      loginUser({ email, password })
+    );
 
-    try {
-
-      // Firebase Login
-
-      const userCredential =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      console.log(userCredential.user);
-
-      // IMPORTANT
-      // Get Firebase ID Token
-
-      const token =
-      await userCredential.user.getIdToken();
-
-      // Store token
-
-      localStorage.setItem(
-        "token",
-        token
-      );
-
+    // Check if login was successful
+    if (loginUser.fulfilled.match(resultAction)) {
       // Clear Inputs
-
       setEmail("");
       setPassword("");
-
-      // Navigate
-
-      navigate("/welcome");
-
+      // Navigate happens in useEffect when isAuthenticated changes
     }
-
-    catch (error) {
-
-      console.log(error);
-
-      // Firebase Errors
-
-      switch(error.code){
-
-        case "auth/invalid-email":
-          setError("Invalid Email");
-          break;
-
-        case "auth/user-not-found":
-          setError("User Not Found");
-          break;
-
-        case "auth/wrong-password":
-          setError("Wrong Password");
-          break;
-
-        case "auth/invalid-credential":
-          setError("Invalid Credentials");
-          break;
-
-        default:
-          setError(error.message);
-
-      }
-
-    }
-
-    finally{
-
-      setIsLoading(false);
-
-    }
-
   };
 
   return (
-
     <div className="auth-container">
-
       <div className="auth-card">
-
         <form onSubmit={handleSubmit}>
-
           <h1>Login</h1>
 
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e)=>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
           />
 
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e)=>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
           />
 
-          <button
-            type="submit"
-            disabled={isLoading}
-          >
-            {
-              isLoading
-              ? "Logging in..."
-              : "Login"
-            }
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Login"}
           </button>
 
-          {/* <p className="forgot-password">
-            Forgot Password
-          </p> */}
           <Link to="/forgot-password">
-            <p className="forgot-password">
-              Forgot Password
-            </p>
+            <p className="forgot-password">Forgot Password</p>
           </Link>
 
-          <p className="error">
-            {error}
-          </p>
+          {error && <p className="error">{error}</p>}
 
           <p className="bottom-text">
-
             Don't have an account?
-
-            <Link to="/signup">
-              {" "}Sign Up
-            </Link>
-
+            <Link to="/signup"> Sign Up</Link>
           </p>
-
         </form>
-
       </div>
-
     </div>
-
   );
 }
 

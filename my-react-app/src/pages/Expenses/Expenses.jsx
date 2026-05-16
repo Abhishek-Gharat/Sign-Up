@@ -1,171 +1,136 @@
-// Expenses.jsx
-
+// Expenses.jsx - Refactored with Redux
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../services/firebase";
+import { useDispatch, useSelector } from "react-redux";
 import {
+  fetchExpenses,
   addExpense,
-  subscribeToExpenses,
   deleteExpense,
   updateExpense,
-} from "../../services/expenseService";
+  setEditingExpense,
+  selectExpenses,
+  selectTotalAmount,
+  selectExpensesLoading,
+  selectExpensesError,
+  selectEditingExpense,
+  selectShowPremiumButton,
+  activatePremium,
+} from "../../store/slices/expensesSlice";
+import {
+  logout,
+  selectUserId,
+  selectIsAuthenticated,
+} from "../../store/slices/authSlice";
 import "./Expenses.css";
 
 function Expenses() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Food");
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-const [editingId, setEditingId] =
-  useState(null);
-  // GET LOGGED IN USER
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/");
-        }
-        setUser(null);
-      }
-    });
 
-    return () => unsubscribe();
-  }, [navigate]);
+  // Get state from Redux
+  const userId = useSelector(selectUserId);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const expenses = useSelector(selectExpenses);
+  const totalAmount = useSelector(selectTotalAmount);
+  const loading = useSelector(selectExpensesLoading);
+  const error = useSelector(selectExpensesError);
+  const editingExpense = useSelector(selectEditingExpense);
+  const showPremiumButton = useSelector(selectShowPremiumButton);
 
-  // LOAD EXPENSES
+  // Load expenses on mount
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
+    if (userId) {
+      dispatch(fetchExpenses(userId));
+    }
+  }, [dispatch, userId]);
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingExpense) {
+      setAmount(editingExpense.amount.toString());
+      setDescription(editingExpense.description);
+      setCategory(editingExpense.category);
+    }
+  }, [editingExpense]);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!amount || !description || !category) {
+      alert("Please fill all fields");
       return;
     }
 
-    const unsubscribe = subscribeToExpenses(user.uid, (fetchedExpenses) => {
-      setExpenses(fetchedExpenses);
-      setLoading(false);
-    });
+    if (!userId) {
+      alert("User not logged in");
+      return;
+    }
 
-    return () => unsubscribe();
-  }, [user]);
+    const expenseData = {
+      amount: Number(amount),
+      description,
+      category,
+      date: new Date().toISOString(),
+    };
 
-  // ADD EXPENSE
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    if (editingExpense) {
+      await dispatch(
+        updateExpense({
+          userId,
+          expenseId: editingExpense.id,
+          expenseData,
+        })
+      );
+    } else {
+      await dispatch(
+        addExpense({
+          userId,
+          expenseData,
+        })
+      );
+    }
 
-  if (
-    !amount ||
-    !description ||
-    !category
-  ) {
-    alert("Please fill all fields");
-
-    return;
-  }
-
-  if (!user) {
-    alert("User not logged in");
-
-    return;
-  }
-
-  const expenseData = {
-    amount: Number(amount),
-    description,
-    category,
-    date: new Date().toISOString(),
+    // Clear form
+    setAmount("");
+    setDescription("");
+    setCategory("Food");
   };
 
-  let result;
+  const handleEdit = (expense) => {
+    dispatch(setEditingExpense(expense));
+  };
 
-  // UPDATE EXPENSE
-  if (editingId) {
-    result = await updateExpense(
-      user.uid,
-      editingId,
-      expenseData
-    );
-
-    if (result.success) {
-      console.log(
-        "Expense updated successfully"
-      );
-
-      // RESET EDIT MODE
-      setEditingId(null);
-
-      setAmount("");
-      setDescription("");
-      setCategory("");
+  const handleDelete = async (expenseId) => {
+    if (userId) {
+      await dispatch(deleteExpense({ userId, expenseId }));
     }
-  }
+  };
 
-  // ADD EXPENSE
-  else {
-    result = await addExpense(
-      user.uid,
-      expenseData
-    );
-
-    if (result.success) {
-      setAmount("");
-      setDescription("");
-      setCategory("");
-    }
-  }
-
-  if (!result.success) {
-    alert(result.error);
-  }
-};
-
-
-const handleEdit = (expense) => {
-  setAmount(expense.amount);
-
-  setDescription(
-    expense.description
-  );
-
-  setCategory(expense.category);
-
-  setEditingId(expense.id);
-};
-  // DELETE EXPENSE
-const handleDelete = async (id) => {
-  if (!user) return;
-
-  const result = await deleteExpense(
-    user.uid,
-    id
-  );
-
-  if (result.success) {
-    console.log(
-      "Expense successfully deleted"
-    );
-  }
-};
-
-  // HANDLE LOGOUT
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userEmail");
+    dispatch(logout());
     navigate("/");
   };
 
-  // HANDLE BACK
   const handleBack = () => {
     navigate("/welcome");
   };
 
-  // FORMAT DATE
+  const handleActivatePremium = () => {
+    dispatch(activatePremium());
+    alert("Premium Activated! You now have access to premium features.");
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -187,12 +152,11 @@ const handleDelete = async (id) => {
     });
   };
 
-  // CALCULATE TOTALS
-  const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  // Calculate today's expenses
   const today = new Date().toDateString();
   const todaySpent = expenses
     .filter((exp) => new Date(exp.date).toDateString() === today)
-    .reduce((sum, exp) => sum + exp.amount, 0);
+    .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
 
   return (
     <div className="expenses-page">
@@ -220,7 +184,7 @@ const handleDelete = async (id) => {
 
           <div className="summary-card">
             <div className="summary-label">Total Amount</div>
-            <div className="summary-value">₹{totalSpent.toFixed(2)}</div>
+            <div className="summary-value">₹{totalAmount.toFixed(2)}</div>
           </div>
 
           <div className="summary-card">
@@ -228,6 +192,40 @@ const handleDelete = async (id) => {
             <div className="summary-value today">₹{todaySpent.toFixed(2)}</div>
           </div>
         </div>
+
+        {/* Premium Activation Button */}
+        {showPremiumButton && (
+          <div
+            className="premium-banner"
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              padding: "15px",
+              borderRadius: "8px",
+              marginBottom: "20px",
+              textAlign: "center",
+            }}
+          >
+            <p style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
+              Your expenses have exceeded ₹10,000! 🎉
+            </p>
+            <button
+              onClick={handleActivatePremium}
+              style={{
+                background: "#ffd700",
+                color: "#333",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                fontSize: "16px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Activate Premium ✨
+            </button>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="expense-form">
@@ -250,11 +248,23 @@ const handleDelete = async (id) => {
             <option>Salary</option>
             <option>Bills</option>
           </select>
-<button type="submit">
-  {editingId
-    ? "Update Expense"
-    : "Add Expense"}
-</button>        </form>
+          <button type="submit">
+            {editingExpense ? "Update Expense" : "Add Expense"}
+          </button>
+        </form>
+
+        {/* Error Display */}
+        {error && (
+          <div
+            style={{
+              color: "red",
+              textAlign: "center",
+              marginBottom: "10px",
+            }}
+          >
+            Error: {error}
+          </div>
+        )}
 
         {/* Loading */}
         {loading ? (
@@ -281,28 +291,24 @@ const handleDelete = async (id) => {
                   <div className="expense-date">{formatDate(expense.date)}</div>
                 </div>
                 <div className="expense-item-actions">
-                  <span className="expense-amount">₹{expense.amount.toFixed(2)}</span>
-                 <div className="expense-buttons">
+                  <span className="expense-amount">
+                    ₹{parseFloat(expense.amount).toFixed(2)}
+                  </span>
+                  <div className="expense-buttons">
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEdit(expense)}
+                    >
+                      Edit
+                    </button>
 
-  <button
-    className="edit-btn"
-    onClick={() =>
-      handleEdit(expense)
-    }
-  >
-    Edit
-  </button>
-
-  <button
-    className="delete-btn"
-    onClick={() =>
-      handleDelete(expense.id)
-    }
-  >
-    Delete
-  </button>
-
-</div>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(expense.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
