@@ -21,9 +21,15 @@ const counterSlice = createSlice({
     },
     decrementBy2: (state) => {
       state.value -= 2;
+    },
+    incrementBy5: (state) => {
+      state.value += 5;
+    },
+    decrementBy5: (state) => {
+      state.value -= 5;
     }
   }
 });
 
-export const { increment, decrement, incrementByAmount, incrementBy2, decrementBy2 } = counterSlice.actions;
+export const { increment, decrement, incrementByAmount, incrementBy2, decrementBy2, incrementBy5, decrementBy5 } = counterSlice.actions;
 export default counterSlice.reducer;
