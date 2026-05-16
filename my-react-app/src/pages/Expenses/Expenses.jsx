@@ -1,4 +1,4 @@
-// Expenses.jsx - Refactored with Redux
+// Expenses.jsx - Refactored with Redux, Theme Support, and CSV Download
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,13 +14,20 @@ import {
   selectExpensesError,
   selectEditingExpense,
   selectShowPremiumButton,
-  activatePremium,
+  activatePremium as activateExpensesPremium,
 } from "../../store/slices/expensesSlice";
 import {
   logout,
   selectUserId,
   selectIsAuthenticated,
 } from "../../store/slices/authSlice";
+import {
+  toggleTheme,
+  activatePremium as activateThemePremium,
+  selectTheme,
+  selectIsDarkMode,
+  selectIsPremiumActivated,
+} from "../../store/slices/themeSlice";
 import "./Expenses.css";
 
 function Expenses() {
@@ -40,6 +47,9 @@ function Expenses() {
   const error = useSelector(selectExpensesError);
   const editingExpense = useSelector(selectEditingExpense);
   const showPremiumButton = useSelector(selectShowPremiumButton);
+  const theme = useSelector(selectTheme);
+  const isDarkMode = useSelector(selectIsDarkMode);
+  const isPremiumActivated = useSelector(selectIsPremiumActivated);
 
   // Load expenses on mount
   useEffect(() => {
@@ -63,6 +73,11 @@ function Expenses() {
       navigate("/");
     }
   }, [isAuthenticated, navigate]);
+
+  // Apply theme to body
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,8 +142,53 @@ function Expenses() {
   };
 
   const handleActivatePremium = () => {
-    dispatch(activatePremium());
-    alert("Premium Activated! You now have access to premium features.");
+    dispatch(activateExpensesPremium());
+    dispatch(activateThemePremium());
+    alert("Premium Activated! You now have access to dark theme and CSV download features.");
+  };
+
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+  };
+
+  // CSV Download Function
+  const handleDownloadCSV = () => {
+    if (expenses.length === 0) {
+      alert("No expenses to download!");
+      return;
+    }
+
+    // Create CSV header
+    const headers = ["Date", "Description", "Category", "Amount (₹)"];
+    
+    // Create CSV rows
+    const rows = expenses.map((expense) => [
+      new Date(expense.date).toLocaleDateString(),
+      expense.description,
+      expense.category,
+      expense.amount,
+    ]);
+
+    // Combine header and rows
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+      "", // Empty line
+      `Total,${expenses.length} expenses,,₹${totalAmount.toFixed(2)}`,
+    ].join("\n");
+
+    // Create blob and download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `expenses_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const formatDate = (dateString) => {
@@ -159,11 +219,29 @@ function Expenses() {
     .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
 
   return (
-    <div className="expenses-page">
+    <div className={`expenses-page ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
       {/* Header */}
       <div className="expenses-header">
         <h1>Expense Tracker</h1>
         <div className="header-buttons">
+          {isPremiumActivated && (
+            <>
+              <button 
+                className="theme-toggle-btn" 
+                onClick={handleToggleTheme}
+                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                {isDarkMode ? "☀️ Light" : "🌙 Dark"}
+              </button>
+              <button 
+                className="download-btn" 
+                onClick={handleDownloadCSV}
+                title="Download expenses as CSV"
+              >
+                📥 Download CSV
+              </button>
+            </>
+          )}
           <button className="back-btn" onClick={handleBack}>
             Back
           </button>
@@ -193,8 +271,8 @@ function Expenses() {
           </div>
         </div>
 
-        {/* Premium Activation Button */}
-        {showPremiumButton && (
+        {/* Premium Activation Banner */}
+        {showPremiumButton && !isPremiumActivated && (
           <div
             className="premium-banner"
             style={{
@@ -208,6 +286,9 @@ function Expenses() {
           >
             <p style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
               Your expenses have exceeded ₹10,000! 🎉
+            </p>
+            <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
+              Unlock Premium Features: Dark Theme & CSV Download
             </p>
             <button
               onClick={handleActivatePremium}
@@ -224,6 +305,23 @@ function Expenses() {
             >
               Activate Premium ✨
             </button>
+          </div>
+        )}
+
+        {/* Premium Status Indicator */}
+        {isPremiumActivated && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "8px",
+              marginBottom: "20px",
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            ⭐ Premium Activated - Enjoy Dark Theme & CSV Export! ⭐
           </div>
         )}
 

@@ -528,3 +528,138 @@
 .edit-btn:hover {
   background: #2563eb;
 }
+
+/* Premium Buttons */
+.theme-toggle-btn,
+.download-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.theme-toggle-btn {
+  background: #6366f1;
+  color: white;
+}
+
+.theme-toggle-btn:hover {
+  background: #4f46e5;
+}
+
+.download-btn {
+  background: #10b981;
+  color: white;
+}
+
+.download-btn:hover {
+  background: #059669;
+}
+
+/* Dark Theme Styles */
+.expenses-page.dark-theme {
+  background: #0f172a;
+}
+
+.dark-theme .expenses-header {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+.dark-theme .expenses-header h1 {
+  color: #f1f5f9;
+}
+
+.dark-theme .back-btn {
+  background: transparent;
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+.dark-theme .back-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+.dark-theme .summary-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .summary-label {
+  color: #94a3b8;
+}
+
+.dark-theme .summary-value {
+  color: #f1f5f9;
+}
+
+.dark-theme .expense-form {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .expense-form input,
+.dark-theme .expense-form select {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark-theme .expense-form input::placeholder {
+  color: #64748b;
+}
+
+.dark-theme .expense-form select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.dark-theme .expense-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .expense-description {
+  color: #f1f5f9;
+}
+
+.dark-theme .expense-category {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.dark-theme .expense-date {
+  color: #64748b;
+}
+
+.dark-theme .expense-amount {
+  color: #f1f5f9;
+}
+
+.dark-theme .no-expenses {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .no-expenses p {
+  color: #94a3b8;
+}
+
+.dark-theme .no-expenses .sub-text {
+  color: #64748b;
+}
+
+.dark-theme .loading-container {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .loading-container p {
+  color: #94a3b8;
+}
