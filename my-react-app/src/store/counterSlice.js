@@ -1,4 +1,5 @@
 // counterSlice.js - Redux Toolkit slice for counter
+// Optimized approach: Using action payloads instead of multiple specific actions
 import { createSlice } from '@reduxjs/toolkit';
 
 const counterSlice = createSlice({
@@ -8,28 +9,25 @@ const counterSlice = createSlice({
   },
   reducers: {
     increment: (state) => {
+      // RTK + Immer allows "mutation" syntax
+      // Behind the scenes, Immer creates a new immutable state
       state.value += 1;
     },
     decrement: (state) => {
       state.value -= 1;
     },
+    // Optimized: Single action that accepts any amount via payload
+    // This replaces incrementBy2, incrementBy5, etc.
     incrementByAmount: (state, action) => {
       state.value += action.payload;
     },
-    incrementBy2: (state) => {
-      state.value += 2;
-    },
-    decrementBy2: (state) => {
-      state.value -= 2;
-    },
-    incrementBy5: (state) => {
-      state.value += 5;
-    },
-    decrementBy5: (state) => {
-      state.value -= 5;
+    // Optimized: Single action that accepts any amount via payload
+    // This replaces decrementBy2, decrementBy5, etc.
+    decrementByAmount: (state, action) => {
+      state.value -= action.payload;
     }
   }
 });
 
-export const { increment, decrement, incrementByAmount, incrementBy2, decrementBy2, incrementBy5, decrementBy5 } = counterSlice.actions;
+export const { increment, decrement, incrementByAmount, decrementByAmount } = counterSlice.actions;
 export default counterSlice.reducer;
