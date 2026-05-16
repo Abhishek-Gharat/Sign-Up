@@ -70,6 +70,15 @@ body{
    box-shadow:0 4px 12px rgba(111,66,193,0.3);
 }
 
+.welcome-page .auth-btn {
+   background:#e83e8c;
+}
+
+.welcome-page .auth-btn:hover {
+   background:#d63384;
+   box-shadow:0 4px 12px rgba(232,62,140,0.3);
+}
+
 .welcome-container{
    height:100vh;
    display:flex;

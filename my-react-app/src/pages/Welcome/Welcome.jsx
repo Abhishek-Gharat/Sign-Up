@@ -67,6 +67,10 @@ function Welcome() {
         🔢 Redux Counter Demo
       </button>
 
+      <button onClick={() => navigate("/auth-demo")} className="auth-btn">
+        🔐 Redux Auth Demo
+      </button>
+
       {auth.currentUser?.emailVerified ? (
         <h3>Email Verified ✅</h3>
       ) : (

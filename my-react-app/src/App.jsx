@@ -7,6 +7,7 @@ import Profile from "./pages/Profile/Profile";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import Expenses from "./pages/Expenses/Expenses";
 import Counter from "./components/Counter/Counter";
+import AuthDemo from "./components/AuthDemo/AuthDemo";
 import {
   BrowserRouter,
   Routes,
@@ -54,6 +55,11 @@ function App() {
         <Route
           path="/counter"
           element={<Counter />}
+        />
+
+        <Route
+          path="/auth-demo"
+          element={<AuthDemo />}
         />
 
       </Routes>
