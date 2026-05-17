@@ -1,0 +1,13 @@
+Implement Redux state management for Expense Tracker
+
+- Created authSlice with async thunks for login/signup
+- Created expensesSlice with CRUD operations
+- Refactored Login component to use Redux auth state
+- Refactored Signup component to use Redux auth state
+- Refactored Expenses component to use Redux expenses state
+- Refactored Welcome component to use Redux auth state
+- Added Premium button activation when expenses > 10000
+- Updated store.js to combine auth and expenses reducers
+- Updated main.jsx to initialize auth from localStorage on app load
+- Added selectors for clean state access
+- Used Redux Toolkit with async thunks for API calls

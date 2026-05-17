@@ -1,4 +1,3 @@
-// Signup.jsx - Refactored with Redux
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,29 +18,23 @@ function Signup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Get auth state from Redux
   const isLoading = useSelector(selectAuthLoading);
   const error = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/welcome");
     }
   }, [isAuthenticated, navigate]);
 
-  // Clear error when component unmounts
   useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
+    return () => dispatch(clearError());
   }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!email || !password || !confirmPassword) {
       alert("All fields are required");
       return;
@@ -52,49 +45,49 @@ function Signup() {
       return;
     }
 
-    // Dispatch signup action
-    const resultAction = await dispatch(
-      signupUser({ email, password })
-    );
-
-    // Check if signup was successful
+    const resultAction = await dispatch(signupUser({ email, password }));
     if (signupUser.fulfilled.match(resultAction)) {
-      // Clear Inputs
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      // Navigate happens in useEffect when isAuthenticated changes
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <form onSubmit={handleSubmit}>
+        {/* autoComplete="off" on form + new-password on inputs prevents browser autofill */}
+        <form onSubmit={handleSubmit} autoComplete="off">
           <h1>Signup</h1>
 
           <input
             type="email"
+            name="signup-email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
+            autoComplete="off"
           />
 
           <input
             type="password"
+            name="signup-password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
+            autoComplete="new-password"
           />
 
           <input
             type="password"
+            name="signup-confirm"
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             disabled={isLoading}
+            autoComplete="new-password"
           />
 
           <button type="submit" disabled={isLoading}>

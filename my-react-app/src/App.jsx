@@ -1,5 +1,3 @@
-// App.jsx
-
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import Welcome from "./pages/Welcome/Welcome";
@@ -8,64 +6,46 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import Expenses from "./pages/Expenses/Expenses";
 import Counter from "./components/Counter/Counter";
 import AuthDemo from "./components/AuthDemo/AuthDemo";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
-
   return (
-
     <BrowserRouter>
-
       <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/counter" element={<Counter />} />
+        <Route path="/auth-demo" element={<AuthDemo />} />
 
-        <Route
-          path="/"
-          element={<Login />}
-        />
-
-        <Route
-          path="/signup"
-          element={<Signup />}
-        />
-
+        {/* Protected Routes */}
         <Route
           path="/welcome"
-          element={<Welcome />}
+          element={
+            <ProtectedRoute>
+              <Welcome />
+            </ProtectedRoute>
+          }
         />
-
         <Route
           path="/profile"
-          element={<Profile />}
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
         />
-
-        <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
-        />
-
         <Route
           path="/expenses"
-          element={<Expenses />}
+          element={
+            <ProtectedRoute>
+              <Expenses />
+            </ProtectedRoute>
+          }
         />
-
-        <Route
-          path="/counter"
-          element={<Counter />}
-        />
-
-        <Route
-          path="/auth-demo"
-          element={<AuthDemo />}
-        />
-
       </Routes>
-
     </BrowserRouter>
-
   );
 }
 

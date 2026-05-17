@@ -11,67 +11,53 @@ function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
-  // Get auth state from Redux
   const isLoading = useSelector(selectAuthLoading);
   const error = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/welcome");
     }
   }, [isAuthenticated, navigate]);
 
-  // Clear error when component unmounts
   useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
+    return () => dispatch(clearError());
   }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validation
-    if (!email || !password) {
-      // Dispatch will handle validation in async thunk
-    }
-
-    // Dispatch login action
-    const resultAction = await dispatch(
-      loginUser({ email, password })
-    );
-
-    // Check if login was successful
+    const resultAction = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(resultAction)) {
-      // Clear Inputs
       setEmail("");
       setPassword("");
-      // Navigate happens in useEffect when isAuthenticated changes
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="on">
           <h1>Login</h1>
 
           <input
             type="email"
+            name="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
+            autoComplete="email"
           />
 
           <input
             type="password"
+            name="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
+            autoComplete="current-password"
           />
 
           <button type="submit" disabled={isLoading}>

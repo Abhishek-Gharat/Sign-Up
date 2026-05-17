@@ -1,33 +1,26 @@
 // authSlice.js - Authentication state management for Expense Tracker
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+// const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
+const API_KEY = "AIzaSyD8L86KAfCrkrVLC3fNCHWXTnWaKuNFqek";
+
 // Async thunk for login
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyD8L86KAfCrkrVLC3fNCHWXTnWaKuNFqek',
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            returnSecureToken: true,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, returnSecureToken: true }),
         }
       );
 
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || 'Login failed');
 
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Login failed');
-      }
-
-      // Store token in localStorage for persistence
       localStorage.setItem('token', data.idToken);
       localStorage.setItem('userId', data.localId);
       localStorage.setItem('email', data.email);
@@ -50,25 +43,16 @@ export const signupUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyD8L86KAfCrkrVLC3fNCHWXTnWaKuNFqek',
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            returnSecureToken: true,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, returnSecureToken: true }),
         }
       );
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || 'Signup failed');
-      }
+      if (!response.ok) throw new Error(data.error?.message || 'Signup failed');
 
       localStorage.setItem('token', data.idToken);
       localStorage.setItem('userId', data.localId);
@@ -112,12 +96,10 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    // Initialize auth from localStorage on app load
     initializeAuth: (state) => {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
       const email = localStorage.getItem('email');
-      
       if (token) {
         state.token = token;
         state.userId = userId;
@@ -128,7 +110,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -144,7 +125,6 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Signup cases
       .addCase(signupUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -165,7 +145,6 @@ const authSlice = createSlice({
 
 export const { logout, clearError, initializeAuth } = authSlice.actions;
 
-// Selectors
 export const selectAuth = (state) => state.auth;
 export const selectToken = (state) => state.auth.token;
 export const selectUserId = (state) => state.auth.userId;
